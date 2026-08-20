@@ -10,15 +10,10 @@ const cloudwatch = new AWS.CloudWatch({
   region: 'eu-west-1'
 });
 
-// Your EC2 instances
-const instances = [
-  { id: 'i-0effb7ee910fc6c71', name: 'Instance 1' },
-  { id: 'i-0eb6f7ffdeda3e8ed', name: 'Instance 2' }
-];
+const LOAD_BALANCER = process.env.LOAD_BALANCER;
+const TARGET_GROUP = process.env.TARGET_GROUP;
 
-// Your Load Balancer + Target Group
-const LOAD_BALANCER = 'app/demo-lb/1fd7f49ebb19eb41';
-const TARGET_GROUP = 'targetgroup/demo-tg/8da016142d8a8315';
+const instances = JSON.parse(process.env.INSTANCES || '[]');
 
 // Helper: fetch + sort CloudWatch data
 async function getMetric(params) {
