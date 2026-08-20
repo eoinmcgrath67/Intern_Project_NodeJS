@@ -20,7 +20,7 @@ export default function Network() {
   useEffect(() => {
     if (!selected) return;
 
-    fetch(`http://backend:3001/network?instanceId=${selected}`)
+    fetch(`http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/network?instanceId=${selected}`)
       .then(res => res.json())
       .then(res => {
         setData({

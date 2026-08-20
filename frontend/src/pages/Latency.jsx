@@ -5,7 +5,7 @@ export default function Latency() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('http://backend:3001/latency')
+    fetch('http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/latency')
       .then(res => res.json())
       .then(res => {
         setData({

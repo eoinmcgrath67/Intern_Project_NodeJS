@@ -5,7 +5,7 @@ export default function Alb() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('http://backend:3001/alb-requests')
+    fetch('http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/alb-requests')
       .then(res => res.json())
       .then(res => {
         setData({
