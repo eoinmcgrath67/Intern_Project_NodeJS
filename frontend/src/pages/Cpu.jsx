@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import InstanceSelector from '../components/InstanceSelector';
+import { API_URL } from '../config';
 import {
   Chart as ChartJS,
   LineElement,
@@ -17,7 +18,7 @@ export default function Cpu() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/instances')
+    fetch(`${API_URL}/instances`)
       .then(res => res.json())
       .then(d => {
         setInstances(d);
@@ -28,7 +29,7 @@ export default function Cpu() {
   useEffect(() => {
     if (!selected) return;
 
-    fetch(`http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/cpu?instanceId=${selected}`)
+    fetch(`${API_URL}/cpu?instanceId=${selected}`)
       .then(res => res.json())
       .then(res => {
         setData({

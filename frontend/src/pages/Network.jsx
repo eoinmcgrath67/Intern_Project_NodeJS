@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import InstanceSelector from '../components/InstanceSelector';
+import { API_URL } from '../config';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
@@ -20,7 +21,7 @@ export default function Network() {
   useEffect(() => {
     if (!selected) return;
 
-    fetch(`http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/network?instanceId=${selected}`)
+    fetch(`${API_URL}/network?instanceId=${selected}`)
       .then(res => res.json())
       .then(res => {
         setData({
