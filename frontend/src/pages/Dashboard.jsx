@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { API_URL } from '../config';
 import {
   Chart as ChartJS,
   LineElement,
@@ -20,7 +19,7 @@ export default function Dashboard() {
 
   // Load instances
   useEffect(() => {
-    fetch(`${API_URL}/instances`)
+    fetch(`/instances`)
       .then(res => res.json())
       .then(data => {
         setInstances(data);
@@ -35,7 +34,7 @@ export default function Dashboard() {
     if (!selected) return;
 
     // CPU
-    fetch(`${API_URL}/cpu?instanceId=${selected}`)
+    fetch(`/cpu?instanceId=${selected}`)
       .then(res => res.json())
       .then(data => {
         setCpuData({
@@ -53,7 +52,7 @@ export default function Dashboard() {
       });
 
     // Network
-    fetch(`${API_URL}/network?instanceId=${selected}`)
+    fetch(`/network?instanceId=${selected}`)
       .then(res => res.json())
       .then(data => {
         setNetworkData({

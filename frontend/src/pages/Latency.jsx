@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { API_URL } from '../config';
 
 export default function Latency() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/latency`)
+    fetch(`/latency`)
       .then(res => res.json())
       .then(res => {
         setData({
