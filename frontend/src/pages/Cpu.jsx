@@ -17,7 +17,7 @@ export default function Cpu() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('http://backend:3001/instances')
+    fetch('http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/instances')
       .then(res => res.json())
       .then(d => {
         setInstances(d);
@@ -28,7 +28,7 @@ export default function Cpu() {
   useEffect(() => {
     if (!selected) return;
 
-    fetch(`http://backend:3001/cpu?instanceId=${selected}`)
+    fetch(`http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/cpu?instanceId=${selected}`)
       .then(res => res.json())
       .then(res => {
         setData({

@@ -5,7 +5,7 @@ export default function Health() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch('http://backend:3001/health')
+    fetch('http://demo-lb-1007612560.eu-west-1.elb.amazonaws.com/health')
       .then(res => res.json())
       .then(res => {
         setData({
