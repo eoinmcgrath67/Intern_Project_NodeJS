@@ -10,12 +10,33 @@ const cloudwatch = new AWS.CloudWatch({
   region: 'eu-west-1'
 });
 
-const LOAD_BALANCER = process.env.LOAD_BALANCER;
-const TARGET_GROUP = process.env.TARGET_GROUP;
 
 const ec2 = new AWS.EC2({
   region: 'eu-west-1'
 });
+
+const elbv2 = new AWS.ELBv2({
+  region: 'eu-west-1'
+});
+
+async function getAlbInfo() {
+  const loadBalancers = await elbv2.describeLoadBalancers().promise();
+
+  const alb = loadBalancers.LoadBalancers.find(
+    lb => lb.LoadBalancerName === 'dev-alb'
+  );
+
+  const targetGroups = await elbv2.describeTargetGroups().promise();
+
+  const tg = targetGroups.TargetGroups.find(
+    tg => tg.TargetGroupName === 'dev-backend-tg'
+  );
+
+  return {
+    loadBalancer: alb.LoadBalancerArn.split('loadbalancer/')[1],
+    targetGroup: tg.TargetGroupArn.split(':targetgroup/')[1]
+  };
+}
 
 
 // Helper: fetch + sort CloudWatch data
@@ -133,13 +154,15 @@ app.get('/network', async (req, res) => {
 // ----------------------
 app.get('/alb-requests', async (req, res) => {
   try {
+    const { loadBalancer } = await getAlbInfo();
+
     const data = await getMetric({
       Namespace: 'AWS/ApplicationELB',
       MetricName: 'RequestCount',
       Dimensions: [
         {
           Name: 'LoadBalancer',
-          Value: LOAD_BALANCER
+          Value: loadBalancer
         }
       ],
       StartTime: new Date(Date.now() - 3600000),
@@ -154,17 +177,16 @@ app.get('/alb-requests', async (req, res) => {
   }
 });
 
-// ----------------------
-// HEALTH (Healthy vs Unhealthy)
-// ----------------------
 app.get('/health', async (req, res) => {
   try {
+    const { loadBalancer, targetGroup } = await getAlbInfo();
+
     const healthy = await getMetric({
       Namespace: 'AWS/ApplicationELB',
       MetricName: 'HealthyHostCount',
       Dimensions: [
-        { Name: 'LoadBalancer', Value: LOAD_BALANCER },
-        { Name: 'TargetGroup', Value: TARGET_GROUP }
+        { Name: 'LoadBalancer', Value: loadBalancer },
+        { Name: 'TargetGroup', Value: targetGroup }
       ],
       StartTime: new Date(Date.now() - 3600000),
       EndTime: new Date(),
@@ -176,8 +198,8 @@ app.get('/health', async (req, res) => {
       Namespace: 'AWS/ApplicationELB',
       MetricName: 'UnHealthyHostCount',
       Dimensions: [
-        { Name: 'LoadBalancer', Value: LOAD_BALANCER },
-        { Name: 'TargetGroup', Value: TARGET_GROUP }
+        { Name: 'LoadBalancer', Value: loadBalancer },
+        { Name: 'TargetGroup', Value: targetGroup }
       ],
       StartTime: new Date(Date.now() - 3600000),
       EndTime: new Date(),
@@ -192,18 +214,17 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// ----------------------
-// LATENCY
-// ----------------------
 app.get('/latency', async (req, res) => {
   try {
+    const { loadBalancer } = await getAlbInfo();
+
     const data = await getMetric({
       Namespace: 'AWS/ApplicationELB',
       MetricName: 'TargetResponseTime',
       Dimensions: [
         {
           Name: 'LoadBalancer',
-          Value: LOAD_BALANCER
+          Value: loadBalancer
         }
       ],
       StartTime: new Date(Date.now() - 3600000),
@@ -213,6 +234,7 @@ app.get('/latency', async (req, res) => {
     });
 
     res.json(data);
+
   } catch (err) {
     res.status(500).send(err);
   }
