@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import { chartOptions } from '../chartOptions';
 
 export default function Alb() {
   const [data, setData] = useState(null);
@@ -22,7 +23,7 @@ export default function Alb() {
   return (
     <>
       <h2>ALB Requests</h2>
-      {data && <Line data={data} />}
+      <Line data={data} options={chartOptions} />
     </>
   );
 }

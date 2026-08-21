@@ -5,10 +5,22 @@ import {
   LineElement,
   CategoryScale,
   LinearScale,
-  PointElement
+  PointElement,
+  Legend,
+  Tooltip
 } from 'chart.js';
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+import './dashboard.css';
+import { chartOptions } from '../chartOptions';
+
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Legend,
+  Tooltip
+);
 
 export default function Dashboard() {
   const [instances, setInstances] = useState([]);
@@ -17,23 +29,21 @@ export default function Dashboard() {
   const [cpuData, setCpuData] = useState(null);
   const [networkData, setNetworkData] = useState(null);
 
-  // Load instances
   useEffect(() => {
-    fetch(`/instances`)
+    fetch('/instances')
       .then(res => res.json())
       .then(data => {
         setInstances(data);
+
         if (data.length > 0) {
           setSelected(data[0].id);
         }
       });
   }, []);
 
-  // Load metrics
   useEffect(() => {
     if (!selected) return;
 
-    // CPU
     fetch(`/cpu?instanceId=${selected}`)
       .then(res => res.json())
       .then(data => {
@@ -45,13 +55,14 @@ export default function Dashboard() {
             {
               label: 'CPU (%)',
               data: data.map(p => p.Average),
-              borderColor: 'blue'
+              borderColor: '#38bdf8',
+              backgroundColor: '#38bdf8',
+              tension: 0.4
             }
           ]
         });
       });
 
-    // Network
     fetch(`/network?instanceId=${selected}`)
       .then(res => res.json())
       .then(data => {
@@ -63,26 +74,54 @@ export default function Dashboard() {
             {
               label: 'Network In',
               data: data.inData.map(p => p.Average),
-              borderColor: 'green'
+              borderColor: '#22c55e',
+              backgroundColor: '#22c55e',
+              tension: 0.4
             },
             {
               label: 'Network Out',
               data: data.outData.map(p => p.Average),
-              borderColor: 'red'
+              borderColor: '#ef4444',
+              backgroundColor: '#ef4444',
+              tension: 0.4
             }
           ]
         });
       });
-
   }, [selected]);
 
-  return (
-    <div>
-      <h2>Dashboard Overview</h2>
 
-      {/* ✅ Instance Selector */}
-      <div style={{ marginBottom: '20px' }}>
-        <label>Select Instance: </label>
+  return (
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">
+        AWS Monitoring Dashboard
+      </h1>
+
+      <div className="stats-row">
+        <div className="stat-card">
+          <h4>Instances</h4>
+          <p>{instances.length}</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Environment</h4>
+          <p>DEV</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Load Balancer</h4>
+          <p>ALB</p>
+        </div>
+
+        <div className="stat-card">
+          <h4>Status</h4>
+          <p>✅</p>
+        </div>
+      </div>
+
+      <div className="selector">
+        <label>Select Instance:</label>
+
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
@@ -95,25 +134,26 @@ export default function Dashboard() {
         </select>
       </div>
 
-      
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '20px'
-      }}>
+      <div className="chart-grid">
+        <div className="chart-card">
+          <h2>CPU Usage</h2>
 
-        
-        <div style={{ border: '1px solid #ccc', padding: '15px' }}>
-          <h3>CPU Usage</h3>
-          {cpuData ? <Line data={cpuData} /> : <p>Loading...</p>}
+          {cpuData ? (
+            <Line data={cpuData} options={chartOptions} />
+          ) : (
+            <p>Loading...</p>
+          )}
         </div>
 
-        
-        <div style={{ border: '1px solid #ccc', padding: '15px' }}>
-          <h3>Network</h3>
-          {networkData ? <Line data={networkData} /> : <p>Loading...</p>}
-        </div>
+        <div className="chart-card">
+          <h2>Network Usage</h2>
 
+          {networkData ? (
+            <Line data={networkData} options={chartOptions} />
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
       </div>
     </div>
   );

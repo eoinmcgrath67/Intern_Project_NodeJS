@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import InstanceSelector from '../components/InstanceSelector';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
+import { chartOptions } from '../chartOptions';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -37,7 +38,7 @@ export default function Network() {
     <>
       <h2>Network</h2>
       <InstanceSelector instances={instances} selected={selected} setSelected={setSelected} />
-      {data && <Line data={data} />}
+      <Line data={data} options={chartOptions} />
     </>
   );
 }

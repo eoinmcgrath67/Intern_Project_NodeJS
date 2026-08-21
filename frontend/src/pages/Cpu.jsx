@@ -8,6 +8,7 @@ import {
   LinearScale,
   PointElement
 } from 'chart.js';
+import { chartOptions } from '../chartOptions';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -46,7 +47,7 @@ export default function Cpu() {
     <>
       <h2>CPU Usage</h2>
       <InstanceSelector instances={instances} selected={selected} setSelected={setSelected} />
-      {data && <Line data={data} />}
+      <Line data={data} options={chartOptions} />
     </>
   );
 }
