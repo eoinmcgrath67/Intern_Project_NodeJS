@@ -7,7 +7,7 @@ import Health from './pages/Health';
 import Alb from './pages/Alb';
 import Latency from './pages/Latency';
 
-import './app.css';
+import './App.css';
 
 function App() {
   return (
