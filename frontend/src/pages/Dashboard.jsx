@@ -10,7 +10,7 @@ import {
   Tooltip
 } from 'chart.js';
 
-import './dashboard.css';
+import '../styles/dashboard.css';
 import { chartOptions } from '../chartOptions';
 
 ChartJS.register(
