@@ -179,36 +179,8 @@ app.get('/alb-requests', async (req, res) => {
 
 app.get('/health', async (req, res) => {
   try {
-    const { loadBalancer, targetGroup } = await getAlbInfo();
-
-    const healthy = await getMetric({
-      Namespace: 'AWS/ApplicationELB',
-      MetricName: 'HealthyHostCount',
-      Dimensions: [
-        { Name: 'LoadBalancer', Value: loadBalancer },
-        { Name: 'TargetGroup', Value: targetGroup }
-      ],
-      StartTime: new Date(Date.now() - 3600000),
-      EndTime: new Date(),
-      Period: 300,
-      Statistics: ['Average']
-    });
-
-    const unhealthy = await getMetric({
-      Namespace: 'AWS/ApplicationELB',
-      MetricName: 'UnHealthyHostCount',
-      Dimensions: [
-        { Name: 'LoadBalancer', Value: loadBalancer },
-        { Name: 'TargetGroup', Value: targetGroup }
-      ],
-      StartTime: new Date(Date.now() - 3600000),
-      EndTime: new Date(),
-      Period: 300,
-      Statistics: ['Average']
-    });
-
-    res.json({ healthy, unhealthy });
-
+    const info = await getAlbInfo();
+    res.json(info);
   } catch (err) {
     res.status(500).send(err);
   }
