@@ -12,7 +12,7 @@ export default function Alb() {
           labels: res.map(p => new Date(p.Timestamp).toLocaleTimeString()),
           datasets: [{
             label: 'Requests',
-            data: res.map(p => p.Average),
+            data: res.map(p => p.Sum),
             borderColor: 'purple'
           }]
         });
