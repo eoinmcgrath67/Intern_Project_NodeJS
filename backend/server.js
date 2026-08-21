@@ -13,7 +13,10 @@ const cloudwatch = new AWS.CloudWatch({
 const LOAD_BALANCER = process.env.LOAD_BALANCER;
 const TARGET_GROUP = process.env.TARGET_GROUP;
 
-const instances = JSON.parse(process.env.INSTANCES || '[]');
+const ec2 = new AWS.EC2({
+  region: 'eu-west-1'
+});
+
 
 // Helper: fetch + sort CloudWatch data
 async function getMetric(params) {
@@ -34,8 +37,37 @@ app.get('/', (req, res) => {
 });
 
 // Instances
-app.get('/instances', (req, res) => {
-  res.json(instances);
+app.get('/instances', async (req, res) => {
+  try {
+    const result = await ec2.describeInstances({
+      Filters: [
+        {
+          Name: 'instance-state-name',
+          Values: ['running']
+        }
+      ]
+    }).promise();
+
+    const instances = [];
+
+    result.Reservations.forEach(reservation => {
+      reservation.Instances.forEach(instance => {
+
+        const nameTag =
+          instance.Tags?.find(tag => tag.Key === 'Name');
+
+        instances.push({
+          id: instance.InstanceId,
+          name: nameTag?.Value || instance.InstanceId
+        });
+      });
+    });
+
+    res.json(instances);
+
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 // ----------------------
